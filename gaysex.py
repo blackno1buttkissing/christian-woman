@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Dict, Tuple, Any
 
-import fitz  # PyMuPDF
+import pymupdf
 import cv2
 import numpy as np
 import pytesseract
@@ -237,7 +237,7 @@ def render_pdf_page(pdf_bytes: bytes, page_number: int) -> Image.Image:
     document = None
 
     try:
-        document = fitz.open(stream=pdf_bytes, filetype="pdf")
+        document = pymupdf.open(stream=pdf_bytes, filetype="pdf")
 
         if document.page_count == 0:
             raise ValueError("The PDF contains no pages.")
@@ -248,11 +248,11 @@ def render_pdf_page(pdf_bytes: bytes, page_number: int) -> Image.Image:
         page = document.load_page(page_number)
 
         # 2x rendering gives Tesseract considerably more useful pixels.
-        matrix = fitz.Matrix(2.0, 2.0)
+        matrix = pymupdf.Matrix(2.0, 2.0)
         pixmap = page.get_pixmap(
             matrix=matrix,
             alpha=False,
-            colorspace=fitz.csRGB,
+            colorspace=pymupdf.csRGB,
         )
 
         image = Image.frombytes(
@@ -736,7 +736,7 @@ if uploaded_file is not None:
 
         if is_pdf:
             try:
-                pdf_document = fitz.open(
+                pdf_document = pymupdf.open(
                     stream=st.session_state["document_bytes"],
                     filetype="pdf",
                 )
